@@ -18,6 +18,7 @@
 #include <Talon.h>
 #include <WPILib.h>
 #include <ADXRS450_Gyro.h>
+#include <Encoder.h>
 
 class Robot : public frc::TimedRobot {
 public:
@@ -28,6 +29,8 @@ public:
 
 	frc::Talon RightDrive{ 	RightDrivePWM };
 	frc::ADXRS450_Gyro gyro{};
+
+	frc::Encoder encoder {2, 3, false, Encoder::k4X};
 
 	double Threshold(double in,double thres){
 		double out = in;
@@ -93,8 +96,8 @@ public:
 			double leftin = controller1.GetRawAxis(1);
 			double rightin = controller1.GetRawAxis(5);
 
-							double left1 = leftin*leftin*leftin;
-							double right1 = rightin*rightin*rightin;
+			double left1 = leftin*leftin*leftin;
+			double right1 = rightin*rightin*rightin;
 
 			LeftDrive.Set(left1);
 			RightDrive.Set(right1);
@@ -102,6 +105,9 @@ public:
 			double gyro_val = gyro.GetAngle();
 
 		frc::SmartDashboard::PutString("Gyro", std::to_string(gyro_val));
+
+		double encoder_value = encoder.Get();
+		frc::SmartDashboard::PutString("DB/String 2", std::to_string(encoder_value));
 
 		bool buttona = controller1.GetRawButton(1);
 		bool buttonb = controller1.GetRawButton(2);
@@ -131,6 +137,30 @@ public:
 
 		}
 
+		bool buttony = controller1.GetRawButton(4);
+		bool buttonrb = controller1.GetRawButton(6);
+
+		if (buttony){
+			encoder.Reset();
+
+		}
+		if (buttonrb){
+			double distance = 10;
+			double error = distance*(428/5) - encoder_value;
+
+			double kp = -.0015;
+			double output = kp * error;
+
+
+			double error_g = 0 - gyro_val;
+
+			double kp_g = .05;
+			double output_g = kp_g * error_g;
+			leftin = Threshold(output_g,0.75);
+			output = Threshold(output,0.75);
+			LeftDrive.Set(-1*leftin+output);
+			RightDrive.Set(leftin+output);
+		}
 
 
 	}
