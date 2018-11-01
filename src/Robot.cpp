@@ -19,6 +19,8 @@
 #include <WPILib.h>
 #include <ADXRS450_Gyro.h>
 #include <Encoder.h>
+#include "NetworkTables/NetworkTable.h"
+#include <iostream>
 
 class Robot : public frc::TimedRobot {
 public:
@@ -48,6 +50,10 @@ public:
 		m_chooser.AddObject(kAutoNameCustom, kAutoNameCustom);
 		frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 		LeftDrive.SetInverted(true);
+
+		std::shared_ptr<NetworkTable> table = NetworkTable::GetTable("limelight");
+		table->PutNumber("ledMode",1);
+		table->PutNumber("pipeline",0);
 	}
 
 	/*
@@ -104,6 +110,17 @@ public:
 
 			double gyro_val = gyro.GetAngle();
 
+			bool buttonlb = controller1.GetRawButton(5);
+			std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
+			table->PutNumber("ledMode",1);
+			table->PutNumber("camMode",0);
+			table->PutNumber("pipeline",0);
+
+			float camera_x = table->GetNumber("tx",0);
+			float camera_exist = table->GetNumber("tv",0);
+
+			frc::SmartDashboard::PutString("tx Cam", std::to_string(camera_x));
+			frc::SmartDashboard::PutString("tv Cam", std::to_string(camera_exist));
 		frc::SmartDashboard::PutString("Gyro", std::to_string(gyro_val));
 
 		double encoder_value = encoder.Get();
@@ -161,6 +178,21 @@ public:
 			LeftDrive.Set(-1*leftin+output);
 			RightDrive.Set(leftin+output);
 		}
+
+
+
+				if (buttonlb and camera_exist == 1){
+					double error = 0 - camera_x;
+
+							double kp_c = .025;
+							double output = kp_c * error;
+							leftin = Threshold(leftin,0.75);
+
+							LeftDrive.Set(leftin+output);
+							RightDrive.Set(leftin-output);
+
+				}
+
 
 
 	}
