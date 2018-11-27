@@ -49,7 +49,7 @@ constexpr int UltrasonicPort = 0;
 
 constexpr int RampLeftPWM = 6;
 constexpr int RampRightPWM = 7;
-
+char* laserval;
 
 
 

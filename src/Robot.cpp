@@ -21,6 +21,8 @@
 #include <Encoder.h>
 #include "NetworkTables/NetworkTable.h"
 #include <iostream>
+#include <SerialPort.h>
+#include <DigitalInput.h>
 
 class Robot : public frc::TimedRobot {
 public:
@@ -32,7 +34,10 @@ public:
 	frc::Talon RightDrive{ 	RightDrivePWM };
 	frc::ADXRS450_Gyro gyro{};
 
+	frc::SerialPort Laser{ 115200, SerialPort::Port::kUSB1};
+	DigitalInput Arduino {0};
 	frc::Encoder encoder {2, 3, false, Encoder::k4X};
+
 
 	double Threshold(double in,double thres){
 		double out = in;
@@ -54,6 +59,7 @@ public:
 		std::shared_ptr<NetworkTable> table = NetworkTable::GetTable("limelight");
 		table->PutNumber("ledMode",1);
 		table->PutNumber("pipeline",0);
+		//Laser.Reset();
 	}
 
 	/*
@@ -192,6 +198,10 @@ public:
 							RightDrive.Set(leftin-output);
 
 				}
+				//Laser.Reset();
+				bool valueout = Arduino.Get();
+				frc::SmartDashboard::PutString("DB/String 7", std::to_string(valueout));
+
 
 
 
