@@ -118,7 +118,7 @@ public:
 
 			bool buttonlb = controller1.GetRawButton(5);
 			std::shared_ptr<NetworkTable> table =  NetworkTable::GetTable("limelight");
-			table->PutNumber("ledMode",1);
+			table->PutNumber("ledMode",0);
 			table->PutNumber("camMode",0);
 			table->PutNumber("pipeline",0);
 
