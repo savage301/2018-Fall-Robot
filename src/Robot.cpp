@@ -124,6 +124,7 @@ public:
 
 			float camera_x = table->GetNumber("tx",0);
 			float camera_exist = table->GetNumber("tv",0);
+			float image_size = table->GetNumber("ta",0);
 
 			frc::SmartDashboard::PutString("tx Cam", std::to_string(camera_x));
 			frc::SmartDashboard::PutString("tv Cam", std::to_string(camera_exist));
@@ -189,13 +190,17 @@ public:
 
 				if (buttonlb and camera_exist == 1){
 					double error = 0 - camera_x;
-
+					double error_size = image_size - 10.85;
 							double kp_c = .025;
 							double output = kp_c * error;
 							leftin = Threshold(leftin,0.75);
 
-							LeftDrive.Set(leftin+output);
-							RightDrive.Set(leftin-output);
+							double k_image = .025;
+							double output_image = k_image * error_size;
+							output_image = Threshold(output_image,0.85);
+
+							LeftDrive.Set(output_image+output);
+							RightDrive.Set(output_image-output);
 
 				}
 				//Laser.Reset();
